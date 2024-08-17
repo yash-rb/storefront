@@ -4,14 +4,15 @@ class Collection(models.Model):
     title = models.CharField(max_length=255)
     featured_product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name='+')
     
-class Promotion:
+class Promotion(models.Model):
     descriptoin = models.CharField(max_length=255)
     discount = models.FloatField()
     
 class Product(models.Model):
     title = models.CharField(max_length=255)    
     description = models.TextField()
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    slug = models.SlugField()
+    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
     inventory = models.IntegerField()
     last_update = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(Collection,on_delete=models.PROTECT )
@@ -31,9 +32,12 @@ class Customer(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField(max_length=254, unique=True)
-    phone = models.models.CharField(max_length=50)
+    phone = models.CharField(max_length=50)
     birth_date = models.DateField(null=True)
     membership = models.CharField(max_length=1, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE)
+    
+    
+        
     
 class Order(models.Model):
     STATUS_PENDING = 'P'
@@ -58,6 +62,7 @@ class OrderItem(models.Model):
     
     
 class Address(models.Model):
+    zip_code = models.CharField(max_length=20)
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
