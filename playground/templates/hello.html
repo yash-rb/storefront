@@ -6,11 +6,18 @@
     <h1>Hello World</h1>
     {% endif %}
 
+    <h2>Latest Orders</h2>
     <ul>
-      {% for product in products %}
-      <li> {{ product.title }} </li>
+      {% for order in orders %}
+        <li>
+          <strong>Order #{{ order.id }}</strong> - Placed on {{ order.placed_at }} by {{ order.customer.first_name }}
+          <ul>
+            {% for item in order.orderitem_set.all %}
+              <li>Product: {{ item.product.title }}</li>
+            {% endfor %}
+          </ul>
+        </li>
       {% endfor %}
-      
     </ul>
       
 
