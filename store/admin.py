@@ -2,8 +2,10 @@ from typing import Any
 from django.db.models import Count
 from django.contrib import admin
 from django.db.models.query import QuerySet
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django.http import HttpRequest
 from . import models
+from tags.models import TaggedItem
 from django.utils.html import format_html, urlencode
 from django.urls import reverse
 # Register your models here.
@@ -20,6 +22,11 @@ class InventoryFilter(admin.SimpleListFilter):
         if self.value() == '<10':
             return queryset.filter(inventory__lt=10)
 
+class TagInline(GenericTabularInline):
+    autocomplete_fields = ['tag']
+    model = TaggedItem
+    extra = 0
+
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     actions = ['clear_inventory']
@@ -28,6 +35,7 @@ class ProductAdmin(admin.ModelAdmin):
     }
     autocomplete_fields = ['collection']
     search_fields = ['product']
+    inlines = [TagInline]
     list_display = ['title', 'unit_price', 'inventory_status', 'collection_title']
     list_editable = ['unit_price']
     list_per_page = 10
