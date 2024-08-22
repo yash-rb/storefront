@@ -1,4 +1,7 @@
+from django.db.models import Count
+from typing import Any
 from django.contrib import admin
+from django.db.models.query import QuerySet
 from . import models
 # Register your models here.
 
@@ -12,7 +15,7 @@ class ProductAdmin(admin.ModelAdmin):
     def collection_title(self, product):
         return product.collection.title
     
-    @admin.display(ordering=['inventory'])
+    @admin.display(ordering='inventory')
     def inventory_status(self, product):
         if product.inventory < 20:
             return 'low'
@@ -25,13 +28,23 @@ class CustomerAdmin(admin.ModelAdmin):
     list_per_page = 10
     ordering = ['first_name', 'last_name']
     
-admin.site.register(models.Collection)
-
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'placed_at','customer', ]
     list_per_page = 10
     list_select_related = ['customer']
     
+@admin.register(models.Collection)
+class CollectionAdmin(admin.ModelAdmin):
+    list_display = ['title', 'products_count']
    
+    @admin.display(ordering='products_count')
+    def products_count(self, collection):
+        return collection.products_count
+
+    def get_queryset(self, request) -> QuerySet[Any]:
+        return super().get_queryset(request).annotate(
+            products_count = Count('product')
+            
+        )
 
